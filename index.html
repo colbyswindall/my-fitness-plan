@@ -212,9 +212,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <div id="page-today" class="page active">
   <div class="day-header">
+    <div id="preview-banner" style="display:none;background:rgba(71,197,255,0.1);border:1px solid rgba(71,197,255,0.3);border-radius:10px;padding:8px 14px;margin-bottom:12px;display:none;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--accent2);font-weight:600;">PREVIEWING — NOT TODAY</span>
+      <button onclick="switchDay(null)" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;">← Back to Today</button>
+    </div>
     <h1 id="today-title">Monday</h1>
     <p id="today-subtitle">Upper Body · Lift Day</p>
-    <div class="day-progress">
+    <div class="day-progress" id="progress-row">
       <div class="day-progress-bar"><div class="day-progress-fill" id="day-fill" style="width:0%"></div></div>
       <div class="day-progress-label" id="day-label">0 / 0 done</div>
     </div>
@@ -318,22 +322,22 @@ const workouts = {
 
 const mealPlans = {
   lift: [
-    { time:'7:00 AM',  icon:'🥤', name:'Protein Shake & Banana',  badge:'meal',  sub:'~380 cal · 30g protein', detail:'1 scoop whey protein + 1 cup milk + 1 banana. Shake or blend.', cal:'380', pro:'30g', carb:'42g', fat:'8g' },
-    { time:'12:00 PM', icon:'🐟', name:'Tuna & Triscuits',         badge:'meal',  sub:'~280 cal · 30g protein', detail:'1 can chunk light tuna + mustard + Triscuits. Pack in the morning before you leave.', cal:'280', pro:'30g', carb:'22g', fat:'4g' },
-    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'Cottage cheese OR 2x Babybel / string cheese. Keep one at your desk.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
+    { time:'7:00 AM',  icon:'🥤', name:'Protein Shake & Banana',  badge:'meal',  sub:'~380 cal · 30g protein', detail:'1 scoop whey protein + 1 cup milk + 1 banana. Shake or blend before you leave.', cal:'380', pro:'30g', carb:'42g', fat:'8g' },
+    { time:'12:00 PM', icon:'🥪', name:'Tuna Sandwich & Quest Chips', badge:'meal', sub:'~430 cal · 49g protein', detail:'1 can chunk light tuna + 2 slices cheese on 2 slices whole wheat bread. Quest protein chips on the side. Pack in the morning.', cal:'430', pro:'49g', carb:'28g', fat:'14g' },
+    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'2x Babybel or string cheese. Keep a stash at your desk.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
     { time:'6:30 PM',  icon:'🍽️', name:'Family Dinner',            badge:'meal',  sub:'~560 cal · 45g protein', detail:'Shared meal with family. Lean protein + veggies + your carb side (rice or potato). She skips the carb.', cal:'560', pro:'45g', carb:'35g', fat:'14g' },
   ],
   walk: [
     { time:'7:00 AM',  icon:'🥤', name:'Protein Shake & Banana',  badge:'meal',  sub:'~380 cal · 30g protein', detail:'1 scoop whey protein + 1 cup milk + 1 banana.', cal:'380', pro:'30g', carb:'42g', fat:'8g' },
-    { time:'12:00 PM', icon:'🐟', name:'Tuna & Triscuits',         badge:'meal',  sub:'~280 cal · 30g protein', detail:'1 can chunk light tuna + mustard + Triscuits.', cal:'280', pro:'30g', carb:'22g', fat:'4g' },
-    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'Cottage cheese OR 2x Babybel / string cheese.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
+    { time:'12:00 PM', icon:'🥪', name:'Tuna Sandwich & Quest Chips', badge:'meal', sub:'~430 cal · 49g protein', detail:'1 can chunk light tuna + 2 slices cheese on 2 slices whole wheat bread. Quest protein chips on the side.', cal:'430', pro:'49g', carb:'28g', fat:'14g' },
+    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'2x Babybel or string cheese.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
     { time:'6:30 PM',  icon:'🍽️', name:'Family Dinner',            badge:'meal',  sub:'~560 cal · 45g protein', detail:'Shared meal. Lean protein + veggies + your carb side.', cal:'560', pro:'45g', carb:'35g', fat:'14g' },
     { time:'8:30 PM',  icon:'🚶', name:'Evening Walk',             badge:'walk',  sub:'20–30 min after kids bed', detail:'Around the neighborhood after 7:30pm. Low impact, burns extra calories, clears your head.', cal:'—', pro:'—', carb:'—', fat:'—' },
   ],
   rest: [
     { time:'8:00 AM',  icon:'🥤', name:'Protein Shake & Banana',  badge:'meal',  sub:'~380 cal · 30g protein', detail:'1 scoop whey protein + 1 cup milk + 1 banana.', cal:'380', pro:'30g', carb:'42g', fat:'8g' },
-    { time:'12:00 PM', icon:'🐟', name:'Tuna & Triscuits',         badge:'meal',  sub:'~280 cal · 30g protein', detail:'1 can chunk light tuna + mustard + Triscuits.', cal:'280', pro:'30g', carb:'22g', fat:'4g' },
-    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'Cottage cheese OR 2x Babybel / string cheese.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
+    { time:'12:00 PM', icon:'🥪', name:'Tuna Sandwich & Quest Chips', badge:'meal', sub:'~430 cal · 49g protein', detail:'1 can chunk light tuna + 2 slices cheese on 2 slices whole wheat bread. Quest protein chips on the side.', cal:'430', pro:'49g', carb:'28g', fat:'14g' },
+    { time:'3:30 PM',  icon:'🧀', name:'Cheese Snack',             badge:'snack', sub:'~150 cal · 12g protein', detail:'2x Babybel or string cheese.', cal:'150', pro:'12g', carb:'4g', fat:'7g' },
     { time:'6:30 PM',  icon:'🍽️', name:'Family Dinner',            badge:'meal',  sub:'~560 cal · 45g protein', detail:'Shared meal. Lean protein + veggies + your carb side.', cal:'560', pro:'45g', carb:'35g', fat:'14g' },
     { time:'8:30 PM',  icon:'😴', name:'Early Night',              badge:'snack', sub:'In bed by 10pm', detail:'If hungry: casein shake or small bowl of cottage cheese. Otherwise just water and sleep.', cal:'~150', pro:'~15g', carb:'5g', fat:'3g' },
   ],
@@ -350,6 +354,7 @@ if (!state.weightLog) state.weightLog = [];
 if (!state.dbWeights) state.dbWeights = {};
 if (!state.workoutDone) state.workoutDone = {};
 if (!state.startDate) state.startDate = new Date().toISOString().split('T')[0];
+state.viewingDay = null; // Always reset viewing day on load
 
 // Auto-reset checklist daily
 const todayStr = new Date().toISOString().split('T')[0];
@@ -362,11 +367,12 @@ function getDayKey() {
 function getDayType() {
   return schedule[getDayKey()].type;
 }
-function getTodayItems() {
-  const type = getDayType();
+function getTodayItems(dayOverride) {
+  const dk = dayOverride || state.viewingDay || getDayKey();
+  const type = schedule[dk].type;
   const items = [];
   if (workouts[type]) {
-    items.push({ id:'workout', kind:'workout', workoutType: type, time:'5:15 AM', icon:'🏋️', name: schedule[getDayKey()].label, badge:'lift', sub:'45 min · 25lb dumbbells · tap to expand' });
+    items.push({ id:'workout', kind:'workout', workoutType: type, time:'5:15 AM', icon:'🏋️', name: schedule[dk].label, badge:'lift', sub:'45 min · 25lb dumbbells · tap to expand' });
   }
   const mealType = (type === 'upper' || type === 'lower' || type === 'full') ? 'lift' : type === 'rest' ? 'rest' : 'walk';
   mealPlans[mealType].forEach((m, i) => items.push({ ...m, id: 'meal-'+i, kind:'meal' }));
@@ -399,21 +405,43 @@ function calcMacros(w) {
 let restInterval = null;
 let workoutOpen = false;
 
+function switchDay(day) {
+  const todayKey = getDayKey();
+  if (!day || day === todayKey) {
+    state.viewingDay = null;
+  } else {
+    state.viewingDay = day;
+  }
+  renderToday();
+}
+
 function renderToday() {
   const dayKey = getDayKey();
-  const sched = schedule[dayKey];
-  document.getElementById('today-title').textContent = new Date().toLocaleDateString('en-US',{weekday:'long'});
+  const viewDay = state.viewingDay || dayKey;
+  const sched = schedule[viewDay];
+  const isPreview = viewDay !== dayKey;
+  
+  // Show/hide preview banner
+  const banner = document.getElementById('preview-banner');
+  banner.style.display = isPreview ? 'flex' : 'none';
+  document.getElementById('progress-row').style.display = isPreview ? 'none' : 'flex';
+  
+  // Day name
+  const dayNames = {MON:'Monday',TUE:'Tuesday',WED:'Wednesday',THU:'Thursday',FRI:'Friday',SAT:'Saturday',SUN:'Sunday'};
+  document.getElementById('today-title').textContent = isPreview ? dayNames[viewDay] : new Date().toLocaleDateString('en-US',{weekday:'long'});
   document.getElementById('today-subtitle').textContent = sched.label + ' · ' + (sched.type === 'rest' ? 'Rest Day' : sched.type === 'walk' ? 'Walk Day' : 'Lift Day');
 
   // Week strip
   const strip = document.getElementById('week-strip');
   const days = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const viewingDay = state.viewingDay || dayKey;
   strip.innerHTML = days.map(d => {
     const s = schedule[d];
     const isToday = d === dayKey;
+    const isViewing = d === viewingDay;
     const isDone = state.workoutDone[d] && state.workoutDone[d].date === todayStr;
-    return `<div class="week-day ${isToday?'today':''} ${isDone?'completed':''}">
-      <div class="week-day-label">${d}</div>
+    return `<div class="week-day ${isToday?'today':''} ${isDone?'completed':''} ${isViewing&&!isToday?'previewing':''}" onclick="switchDay('${d}')" style="${isViewing&&!isToday?'border-color:var(--accent2);':isViewing?'':''}">
+      <div class="week-day-label" style="${isViewing&&!isToday?'color:var(--accent2)':''}">${d}</div>
       <div class="week-day-dot ${s.dot}"></div>
     </div>`;
   }).join('');
@@ -427,13 +455,13 @@ function renderToday() {
 
   const cl = document.getElementById('checklist');
   cl.innerHTML = items.map(item => {
-    const isDone = !!state.checked[item.id];
-    if (item.kind === 'workout') return renderWorkoutItem(item, isDone);
-    return renderMealItem(item, isDone);
+    const isDone = isPreview ? false : !!state.checked[item.id];
+    if (item.kind === 'workout') return renderWorkoutItem(item, isDone, isPreview);
+    return renderMealItem(item, isDone, isPreview);
   }).join('');
 }
 
-function renderWorkoutItem(item, isDone) {
+function renderWorkoutItem(item, isDone, isPreview) {
   const exs = workouts[item.workoutType];
   const exRows = exs.map(ex => {
     const prev = getPrevWeight(ex.id);
@@ -474,9 +502,7 @@ function renderWorkoutItem(item, isDone) {
         <div class="rest-bar-track"><div class="rest-bar-fill" id="rest-fill-${item.id}" style="width:100%"></div></div>
         <button class="rest-skip-btn" onclick="skipRest('${item.id}')">Skip</button>
       </div>
-      <div class="workout-actions-bar">
-        <button class="btn-start" id="btn-start-${item.id}" onclick="markWorkoutDone('${item.id}')">✓ MARK COMPLETE</button>
-      </div>
+      ${!isPreview ? `<div class="workout-actions-bar"><button class="btn-start" id="btn-start-${item.id}" onclick="markWorkoutDone('${item.id}')">✓ MARK COMPLETE</button></div>` : '<div style="padding:14px 16px;font-size:13px;color:var(--muted);background:var(--surface2);">Preview — complete this on the actual day</div>'}
     </div>
   </div>`;
 }
@@ -556,7 +582,7 @@ function saveWeight(exId, val) {
 }
 
 function updateProgress() {
-  const items = getTodayItems();
+  const items = getTodayItems(getDayKey());
   const total = items.length;
   const done = items.filter(i => state.checked[i.id]).length;
   document.getElementById('day-fill').style.width = total ? (done/total*100)+'%' : '0%';
